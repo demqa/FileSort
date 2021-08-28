@@ -1,6 +1,6 @@
 # FileSort
 ## Usage
-
+You can use program to sort your text file by alphabet
 ## Installation
 ### Linux
 #### PROGRAM
