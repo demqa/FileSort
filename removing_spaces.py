@@ -1,12 +1,10 @@
-
-
-def elimina_client(self):
-    f = open("onegin.txt","r")
+def remove_spaces(self):
+    f = open("hamlet.txt","r")
     lines=f.readlines()
     f.close()
-    f = open("onegin1.txt","w")   
+    f = open("hamlet_1.txt","w")   
     for line in lines:
         if line!="\n":
-            f.write(line)
-
-elimina_client(1)
+            f.write(line.lstrip())
+	
+remove_spaces(1)
