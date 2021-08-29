@@ -1,3 +1,5 @@
+// rename header.h to something else... p.e. filename.h
+
 #include <stdbool.h>
 #include <math.h>
 #include <assert.h>
@@ -5,10 +7,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <locale>
 
-
-const int MAX_LINES = 7000;
-const int MAX_LINE_LEN = 600;
-const char FILE_INPUT[] = "onegin.txt";
-const char FILE_OUTPUT[] = "sorted_onegin.txt";
-
+enum ErrorCode{
+    WRONG_INPUT_FILE_NAME = 0x1111,
+    WRONG_OUTPUT_FILE_NAME,
+    CANT_ALLOCATE_MEMORY_BUFFER,
+    CANT_ALLOCATE_MEMORY_LINES,
+    CANT_GENERATE_FILENAME_ORIG_OUT,
+};
