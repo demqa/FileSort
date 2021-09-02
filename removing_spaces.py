@@ -1,10 +1,10 @@
-def remove_spaces(self):
-    f = open("hamlet.txt","r")
-    lines=f.readlines()
+def remove_spaces(file):
+    f = open(file, "r")
+    lines = f.readlines()
     f.close()
-    f = open("hamlet_1.txt","w")   
+    f = open("new_" + file, "w")   
     for line in lines:
-        if line!="\n":
+        if line != "\n":
             f.write(line.lstrip())
 	
-remove_spaces(1)
+remove_spaces("Alice.txt")
