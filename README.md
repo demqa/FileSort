@@ -14,4 +14,4 @@ make
 make clean
 ```
 ## Features
-* Use can use additional program to remove empty lines. 
+* Use can use additional program to remove empty lines and useless spaces. 
