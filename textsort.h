@@ -10,13 +10,25 @@ enum ErrorCode{
     WRITE_TEXT_IS_NULLPTR,
     WRITE_FILENAME_IS_NULLPTR,
     WHAT_IS_WITH_MY_PROGRAM,
+    FILESIZE_STREAM_IS_NULLPTR,
+    READBUFFER_TEXT_IS_NULLPTR,
+    READBUFFER_STREAM_IS_NULLPTR,
+    READBUFFER_FREAD_CANT_READ,
+    CONSTRUCT_FILENAME_IS_NULLPTR,
+    CONSTRUCT_TEXT_IS_NULLPTR,
+    SORT_TEXT_IS_NULLPTR,
+    SORT_CMP_IS_NULLPTR,
+    // GENERATE_FILENAME_IS_NULLPTR,
+    // GENERATE_PREFIX_IS_NULLPTR,
 };
 
 int CmpAlphaOrd(const void *left, const void *right);
+int CmpReverseOrd(const void *left, const void *right);
 int CmpOriginalText(const void *left, const void *right);
-void SortText(Text *text, int Cmp(const void*, const void*), int ReverseOrder);
-char *GenOutFileName(char *filename, const char *prefix);
+int SortText(Text *text, int Cmp(const void*, const void*));
+char *GenerateName(char *filename, const char *prefix);
 int PrintErrorCode(int error_code);
+void CheckError(int *error_code);
 int ConstructText(const char *filename, Text *text);
 int DestructText(Text *text);
 int WriteText(Text *text, const char *filename);

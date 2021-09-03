@@ -2,7 +2,9 @@
 #include "textsort.h"
 
 size_t FileSize(FILE *stream){
-    assert(stream != nullptr);
+    if (stream == nullptr){
+        return FILESIZE_STREAM_IS_NULLPTR;
+    }
 
     struct stat buff = {};
     
@@ -15,12 +17,24 @@ size_t FileSize(FILE *stream){
 }
 
 int ReadBuffer(Text *text, FILE *stream){
+    if (text == nullptr){
+        return READBUFFER_TEXT_IS_NULLPTR;
+    }
+    if (stream == nullptr){
+        return READBUFFER_STREAM_IS_NULLPTR;
+    }
+
     text->buffer = (char *) calloc(text->filesize + 1, sizeof(char));
     if (text->buffer == nullptr){
         return CANT_ALLOCATE_MEMORY_BUFFER;
     }
 
-    fread(text->buffer, sizeof(char), text->filesize, stream);
+    int count = fread(text->buffer, sizeof(char), text->filesize, stream);
+    if (count != text->filesize){
+        fclose(stream);
+        return READBUFFER_FREAD_CANT_READ;
+    }
+
     text->buffer[text->filesize] = '\0';
 
     fclose(stream);
@@ -48,8 +62,12 @@ int NumberOfLines(Text *text){
 }
 
 int ConstructText(const char *filename, Text *text){
-    assert(filename != nullptr);
-    assert(text != nullptr);
+    if (filename == nullptr){
+        return CONSTRUCT_FILENAME_IS_NULLPTR;
+    }
+    if (text == nullptr){
+        return CONSTRUCT_TEXT_IS_NULLPTR;
+    }
 
     FILE *stream = fopen(filename, "rb");
     if (stream == nullptr){
@@ -167,6 +185,38 @@ int CmpAlphaOrd(const void *left_line, const void *right_line){
     return left.length - right.length;
 }
 
+int CmpReverseOrd(const void *left_line, const void *right_line){
+    assert(left_line != nullptr);
+    assert(right_line != nullptr);
+
+    const Line left = *(Line *)left_line;
+    const Line right = *(Line *)right_line;
+    
+    int iter_l = left.length - 2, iter_r = right.length - 2;
+    for ( ; left.ptr[iter_l] != '\0' && right.ptr[iter_r] != '\0'; ){
+        if (isalpha(left.ptr[iter_l]) == 0){
+            --iter_l;
+            continue;
+        }
+        if (isalpha(right.ptr[iter_r]) == 0){
+            --iter_r;
+            continue;
+        }
+
+        if (left.ptr[iter_l] == right.ptr[iter_r]){
+            --iter_l; --iter_r;
+        }else{
+            if(left.ptr[iter_l] < right.ptr[iter_r]){
+                return -1;
+            }else{
+                return 1;
+            }
+        }
+    }
+
+    return left.length - right.length;
+}
+
 int CmpOriginalText(const void *left_line, const void *right_line){
     assert(left_line != nullptr);
     assert(right_line != nullptr);
@@ -177,30 +227,43 @@ int CmpOriginalText(const void *left_line, const void *right_line){
     return (left.order - right.order);
 }
 
-void SortText(Text *text, int Cmp(const void*, const void*)){
-    assert(text != nullptr);
+int SortText(Text *text, int Cmp(const void*, const void*)){
+    if (text == nullptr){
+        return SORT_TEXT_IS_NULLPTR;
+    }
+    if (Cmp == nullptr){
+        return SORT_CMP_IS_NULLPTR;
+    }
 
-    qsort(text->lines, text->nlines, sizeof(Line), Cmp); // You cant reverse every single comparator, only CmpAlphaOrd
+    qsort(text->lines, text->nlines, sizeof(Line), Cmp);
+    
+    return 0;
 }
 
-char *GenOutFileName(char *filename, const char *prefix){
-    assert(filename != nullptr);
-    assert(prefix != nullptr);
-
-    char *nameNew = (char *) calloc(strlen(filename) + 1 + strlen(prefix), sizeof(char));
-    if (nameNew == nullptr){
+// can be changed to int GenerateName(char *new_name, char *name, char *prefix)
+char *GenerateName(char *filename, const char *prefix){ 
+    if (filename == nullptr){
+        return nullptr;
+    }
+    if (prefix == nullptr){
         return nullptr;
     }
 
-    strcpy(nameNew, prefix);
-    strcat(nameNew, "_");
-    strcat(nameNew, filename);
+    char *name_new = (char *) calloc(strlen(filename) + 1 + strlen(prefix), sizeof(char));
+    if (name_new == nullptr){
+        return nullptr;
+    }
 
-    return nameNew;
+    strcpy(name_new, prefix);
+    strcat(name_new, "_");
+    strcat(name_new, filename);
+
+    return name_new;
 }
 
-// change to char *Function(int error_code){ return error_phrase(error_code); };
+// can be changed to char *Function(int error_code){ return error_phrase(error_code); };
 int PrintErrorCode(int error_code){
+    printf("code: %x\n", error_code);
     switch (error_code){
         case WRONG_INPUT_FILE_NAME:
             puts("I cant find this input file (((");
@@ -210,7 +273,7 @@ int PrintErrorCode(int error_code){
             break;
         case CANT_ALLOCATE_MEMORY_BUFFER:
              CANT_ALLOCATE_MEMORY_LINES:
-            puts("I cant allocate memory for you (");
+            puts("I cant allocate memory for you girl... (((((((");
             break;
         case CANT_GENERATE_FILENAME_ORIG_OUT:
             puts("I cant generate filename orig out");
@@ -230,10 +293,34 @@ int PrintErrorCode(int error_code){
         case WHAT_IS_WITH_MY_PROGRAM:
             puts("If you got there, I can only admire you");
             break;
+        case FILESIZE_STREAM_IS_NULLPTR:
+            READBUFFER_STREAM_IS_NULLPTR:
+            puts("Stream is null, I cant do anything(");
+            break;
+        case READBUFFER_TEXT_IS_NULLPTR:
+            CONSTRUCT_TEXT_IS_NULLPTR:
+            SORT_TEXT_IS_NULLPTR:
+            puts("The text is null, what can I do?");
+            break;
+        case READBUFFER_FREAD_CANT_READ:
+            puts("FREAD DOESNT WORK, WHAT THE...");
+            break;
+        case CONSTRUCT_FILENAME_IS_NULLPTR:
+            puts("FILENAME IS NULL");
+            break;
+        case SORT_CMP_IS_NULLPTR:
+            puts("Where is my comparator... give it back...");
+            break;
         default:
             puts("I dont even know this error code ((((");
-            printf("%x\n", error_code);
             break;
     }
     return 0;
+}
+
+void CheckError(int *error_code){
+    if (*error_code){
+        PrintErrorCode(*error_code);
+        *error_code = 0;
+    }
 }
