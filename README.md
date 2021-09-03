@@ -1,12 +1,13 @@
 # FileSort
 ## Usage
 You can use program to sort your text file by alphabet
+
 ## Installation
 ### Linux
 #### PROGRAM
 ```
 make
-./program
+./program input.txt output.txt
 ```
 #### To remove trash after program using
 ```
