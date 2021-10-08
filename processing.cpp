@@ -8,7 +8,7 @@ size_t FileSize(FILE *stream){
 
     struct stat buff = {};
     
-    if(stream != NULL){
+    if (stream != NULL){
         fstat(fileno(stream), &buff);
         return buff.st_size;
     }
